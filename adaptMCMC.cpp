@@ -59,49 +59,7 @@ double lp_svmodel(Eigen::VectorXd& para, Eigen::MatrixXd& data)
 			+ fz_inv(para(1)) * (para.segment(3, n) - para(0) * Eigen::VectorXd::Ones(n)), exp(para(2)) * Eigen::VectorXd::Ones(n));
 }
 
-class Point2d
-{
-private:
-	double m_x;
-	double m_y;
-	int m_test;
 
-public:
-	Point2d(double x = 0.0, double y = 0.0)
-	{
-		m_x = x;
-		m_y = y;
-
-	}
-
-	void print()
-	{
-		std::cout << "Point2d(" << m_x << "," << m_y << ")\n";
-	}
-
-	double distanceTo(Point2d p)
-	{
-		return(sqrt((m_x - p.m_x) * (m_x - p.m_x) + (m_y - p.m_y) * (m_y - p.m_y)));
-	}
-
-	friend double distanceFrom(Point2d p1, Point2d p2);
-
-	int get_test()
-	{
-		return m_test;
-	}
-};
-
-double distanceFrom(Point2d p1, Point2d p2)
-{
-	return(sqrt((p1.m_x - p2.m_x) * (p1.m_x - p2.m_x) + (p1.m_y - p2.m_y) * (p1.m_y - p2.m_y)));
-}
-
-myMat test(int ncols, int nrows)
-{
-	myMat mat(ncols, nrows);
-	return(mat);
-}
 
 double loglik(Eigen::VectorXd& para, Eigen::MatrixXd& data)
 {
