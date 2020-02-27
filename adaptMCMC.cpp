@@ -1,5 +1,4 @@
-// Project1.cpp : Diese Datei enthält die Funktion "main". Hier beginnt und endet die Ausführung des Programms.
-//
+
 //CHECK FOR INT OVERFLOW
 //CHANGE LOOP INDEX TO TYPE SIZE_T
 
