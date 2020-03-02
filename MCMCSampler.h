@@ -10,14 +10,14 @@ constexpr double pi = 3.14159265358979323846;
 
 class MCMCSampler
 {
-public:
+private:
 	BayesModel m_bm;
 	Moments m_moments;
 	int m_iter;
 	int m_seed;
 	int m_d;
 	int m_iter_count;
-	Eigen::MatrixXd m_identity;
+	Eigen::MatrixXd m_identity = Eigen::MatrixXd::Identity(m_d, m_d);
 	Eigen::MatrixXd m_scaling;
 	Rand m_rand;
 	Eigen::VectorXd m_para_proposed;
@@ -47,6 +47,7 @@ public:
 		m_scaling_para = scaling_para;
 		m_p = p;
 		m_c_monroe = calc_c_monroe(m_p, m_d);
+
 		if (m_d == 1)
 		{
 			m_scaling = Eigen::MatrixXd::Identity(m_d, m_d) * m_scaling_para;
@@ -73,7 +74,7 @@ public:
 		}
 	}
 
-	static double calc_c_monroe(double p, double d)
+	static double calc_c_monroe(const double p, const double d)
 	{
 		double alpha;
 		boost::math::normal norm;
@@ -144,6 +145,17 @@ public:
 	Eigen::VectorXd get_accept_vec()
 	{
 		return m_accept_vec;
+	}
+
+	Eigen::MatrixXd get_samples()
+	{
+		return m_samples;
+	}
+
+	Eigen::VectorXd post_mean(int burnin = 0)
+	{
+		assert(burnin < m_iter_count);
+		return m_samples.block(burnin, 0, m_iter_count - burnin, m_d).colwise().mean();
 	}
 };
 

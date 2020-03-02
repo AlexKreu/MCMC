@@ -63,7 +63,7 @@ double loglik(Eigen::VectorXd& para, Eigen::MatrixXd& data)
 
 
 //normal density with parameters mu, and log(sigma)
-double mylp(Eigen::VectorXd& para, Eigen::MatrixXd& data)
+double mylp(const Eigen::VectorXd& para, const Eigen::MatrixXd& data)
 {
 	return -data.rows() * para(1) - 0.5 * ((data.col(0) - para(0) * Eigen::MatrixXd::Ones(data.rows(), 1)) * 1 / exp(para(1))).cwiseAbs2().sum();;
 }
@@ -101,12 +101,13 @@ int main()
 	}
 
 	auto stop = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	Eigen::VectorXd postmean(2);
-	postmean(0) = mySampler.m_samples.col(0).segment(500, iter - 500).mean();
-	postmean(1) = mySampler.m_samples.col(1).segment(500, iter - 500).unaryExpr(&my_exp).mean();
+	postmean(0) = mySampler.get_samples().col(0).segment(500, iter - 500).mean();
+	postmean(1) = mySampler.get_samples().col(1).segment(500, iter - 500).unaryExpr(&my_exp).mean();
 	std::cout << "time taken: " << iter << " iterations took " << duration.count() << " seconds" << std::endl;
 	std::cout << "posterior mean estimates: " << postmean << std::endl;
+	std::cout << "posterior mean estimates: " << mySampler.post_mean(2000) << std::endl;
 	//std::cout << "avg accept tail: " << mySampler.get_accept_vec().tail(1000).mean() << std::endl;
 	std::cout << "avg accept total: " << mySampler.get_accept_vec().mean() << std::endl;
 	

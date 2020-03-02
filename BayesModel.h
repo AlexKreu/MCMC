@@ -8,11 +8,10 @@ class BayesModel
 private:
 	Eigen::VectorXd m_para;
 	Eigen::MatrixXd m_data;
+	double (*m_logpost)(const Eigen::VectorXd& para, const Eigen::MatrixXd& data);
 
 public:
-	double (*m_logpost)(Eigen::VectorXd& para, Eigen::MatrixXd& data);
-
-	BayesModel(Eigen::VectorXd& para, Eigen::MatrixXd& data, double (*logpost)(Eigen::VectorXd& para, Eigen::MatrixXd& data))
+	BayesModel(Eigen::VectorXd& para, Eigen::MatrixXd& data, double (*logpost)(const Eigen::VectorXd& para, const Eigen::MatrixXd& data))
 	{
 		m_para = para;
 		m_data = data;
@@ -27,12 +26,12 @@ public:
 
 	double lp()
 	{
-		return (*m_logpost)(m_para, m_data);
+		return m_logpost(m_para, m_data);
 	}
 
-	double lp(Eigen::VectorXd para)
+	double lp(const Eigen::VectorXd& para)
 	{
-		return (*m_logpost)(para, m_data);
+		return m_logpost(para, m_data);
 	}
 
 	int get_para_dim()

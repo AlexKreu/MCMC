@@ -133,6 +133,12 @@
   <ItemGroup>
     <ClCompile Include="adaptMCMC.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BayesModel.h" />
+    <ClInclude Include="MCMCSampler.h" />
+    <ClInclude Include="Moments.h" />
+    <ClInclude Include="Rand.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

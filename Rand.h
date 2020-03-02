@@ -29,6 +29,17 @@ public:
 	Rand(int seed = 123) : m_randgen(RENG(seed)), m_sndist(NDIST(0, 1)), m_sngen(m_randgen, m_sndist), m_unif(UNIF(0, 1)), m_ugen(m_randgen, m_unif)
 	{};
 
+	/*
+	Rand(int seed = 123)
+	{
+		RENG m_randgen(seed);
+		NDIST m_sndist(0, 1);
+		NGEN m_sngen(m_randgen, m_sndist);
+		UNIF m_unif(0, 1);
+		UGEN m_ugen(m_randgen, m_unif);
+	}
+	*/
+
 	void set_seed(int seed)
 	{
 		m_randgen = RENG(seed);
@@ -39,12 +50,12 @@ public:
 		return m_ugen();
 	}
 
-	Eigen::VectorXd n(Eigen::MatrixXd mu = zero_vec, Eigen::MatrixXd sigma = one_mat)
+	Eigen::VectorXd n(const Eigen::MatrixXd& mu = zero_vec, const Eigen::MatrixXd& sigma = one_mat)
 	{
 		return mu + sigma * m_sngen();
 	}
 
-	Eigen::VectorXd mn(Eigen::VectorXd meanvec, Eigen::MatrixXd covmat)
+	Eigen::VectorXd mn(const Eigen::VectorXd& meanvec, const Eigen::MatrixXd& covmat)
 	{
 		Eigen::VectorXd normals(covmat.cols());
 		Eigen::LLT<Eigen::MatrixXd> llt(covmat);
