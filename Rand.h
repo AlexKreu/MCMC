@@ -29,17 +29,6 @@ public:
 	Rand(int seed = 123) : m_randgen(RENG(seed)), m_sndist(NDIST(0, 1)), m_sngen(m_randgen, m_sndist), m_unif(UNIF(0, 1)), m_ugen(m_randgen, m_unif)
 	{};
 
-	/*
-	Rand(int seed = 123)
-	{
-		RENG m_randgen(seed);
-		NDIST m_sndist(0, 1);
-		NGEN m_sngen(m_randgen, m_sndist);
-		UNIF m_unif(0, 1);
-		UGEN m_ugen(m_randgen, m_unif);
-	}
-	*/
-
 	void set_seed(int seed)
 	{
 		m_randgen = RENG(seed);

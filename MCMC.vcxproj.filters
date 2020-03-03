@@ -23,13 +23,13 @@
     <ClInclude Include="BayesModel.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="MCMCSampler.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Moments.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Rand.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="AMHSampler.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

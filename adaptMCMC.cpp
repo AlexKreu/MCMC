@@ -16,7 +16,7 @@
 #include "BayesModel.h"
 #include "Rand.h"
 //#include "Moments.h"
-#include "MCMCsampler.h"
+#include "AMHsampler.h"
 
 
 typedef int_fast32_t fint;
@@ -85,7 +85,7 @@ int main()
 	BayesModel bm(para, data, mylp);
 	
 	int iter = 100000;
-	MCMCSampler mySampler(bm, iter, 2, 13, 0.5);
+	AMHSampler mySampler(bm, iter, 2, 13, 0.5);
 
 	auto start = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < 1000; ++i)

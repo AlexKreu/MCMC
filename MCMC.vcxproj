@@ -135,7 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BayesModel.h" />
-    <ClInclude Include="MCMCSampler.h" />
+    <ClInclude Include="AMHSampler.h" />
     <ClInclude Include="Moments.h" />
     <ClInclude Include="Rand.h" />
   </ItemGroup>
