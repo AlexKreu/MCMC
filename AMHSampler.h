@@ -11,7 +11,7 @@ constexpr double pi = 3.14159265358979323846;
 class AMHSampler
 {
 private:
-	BayesModel m_bm;
+	BayesModel& m_bm;
 	Moments m_moments;
 	int m_iter;       //total number of iterations
 	int m_iter_count; //the current iteration
@@ -24,7 +24,6 @@ private:
 	Eigen::VectorXd m_zero_vec;
 	void (AMHSampler::* update_scaling) ();
 	Eigen::VectorXd(AMHSampler::* gen_normal) ();
-	bool m_adapt;
 	double m_scaling_para;
 	double m_R;
 	Eigen::VectorXd m_accept_vec;
@@ -34,11 +33,10 @@ private:
 public:
 	Eigen::MatrixXd m_samples;
 
-	AMHSampler(BayesModel& bm, int iter, double scaling_para = 1, int seed = 123, double p = 0.23)
+	AMHSampler(BayesModel& bm, int iter, double scaling_para = 1, int seed = 123, double p = 0.23) : m_bm(bm)
 	{
 		m_iter_count = 0;
 		m_iter = iter;
-		m_bm = bm;
 		m_para_proposed = m_bm.get_para();
 		m_d = bm.get_para_dim();
 		m_identity = Eigen::MatrixXd::Identity(m_d, m_d);
@@ -56,8 +54,7 @@ public:
 
 		m_rand.set_seed(seed);
 		m_samples = Eigen::MatrixXd(m_iter, m_d);
-		m_adapt = false;
-		set_adapt_flag(m_adapt);
+		set_adapt_flag(false);
 		update_scaling = &AMHSampler::no_update;
 		m_R = -1000;
 		m_accept_vec = Eigen::VectorXd(m_iter);
@@ -102,6 +99,7 @@ public:
 	{
 		if (adapt)
 		{
+			if(m_iter_count < 1) throw "m_iter_count > 0 is required to turn on adaption";
 			m_moments = Moments(m_samples.block(0, 0, m_iter_count, m_d));
 			if (m_d == 1)
 			{
