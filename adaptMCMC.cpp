@@ -3,23 +3,11 @@
 //CHANGE LOOP INDEX TO TYPE SIZE_T
 
 #include <iostream>
-//#include <vector>
-//#include <cmath>
-//#include <math.h>
-
 #include <chrono>
-//#include <Eigen/Dense>
-//#include <boost/math/distributions/normal.hpp>
-//#include <unsupported/Eigen/MatrixFunctions>
 #include <fstream>
-//#include <Eigen/LU> 
 #include "BayesModel.h"
 #include "Rand.h"
-//#include "Moments.h"
 #include "AMHsampler.h"
-
-
-typedef int_fast32_t fint;
 
 double fz(double x)
 {
@@ -30,8 +18,6 @@ double fz_inv(double x)
 {
 	return (exp(2.0 * x) - 1.0) / (exp(2.0 * x) + 1.0);
 }
-
-
 
 double my_exp(double x) // the functor we want to apply
 {
@@ -62,11 +48,19 @@ double loglik(Eigen::VectorXd& para, Eigen::MatrixXd& data)
 
 
 
-//normal density with parameters mu, and log(sigma)
-double mylp(const Eigen::VectorXd& para, const Eigen::MatrixXd& data)
+//normal density with parameters mu and log(sigma)
+double mylp(const Eigen::VectorXd& para, const Eigen::MatrixXd& data, const Eigen::VectorXd& para_no_update)
 {
-	return -data.rows() * para(1) - 0.5 * ((data.col(0) - para(0) * Eigen::MatrixXd::Ones(data.rows(), 1)) * 1 / exp(para(1))).cwiseAbs2().sum();;
+	return -data.rows() * para(1) - 0.5 * ((data.col(0) - para(0) * Eigen::MatrixXd::Ones(data.rows(), 1)) * 1 / exp(para(1))).cwiseAbs2().sum();
 }
+
+
+//normal density with parameters mu and log(sigma)
+double mylp_mu(const Eigen::VectorXd& para, const Eigen::MatrixXd& data)
+{
+	return -data.rows() * para(1) - 0.5 * ((data.col(0) - para(0) * Eigen::MatrixXd::Ones(data.rows(), 1)) * 1 / exp(para(1))).cwiseAbs2().sum();
+}
+
 
 
 

@@ -1,5 +1,5 @@
-#ifndef AMHSAMPLER_H
-#define AMHSAMPLER_H
+#ifndef MCMCSAMPLER_H
+#define MCMCSAMPLER_H
 
 #include <boost/math/distributions/normal.hpp>
 #include "BayesModel.h"
@@ -13,17 +13,19 @@ class AMHSampler
 private:
 	BayesModel m_bm;
 	Moments m_moments;
-	int m_iter;       //total number of iterations
-	int m_iter_count; //the current iteration
-	int m_seed;
-	int m_d;         //dimension of the parameter vector
+	int_fast32_t m_iter;
+	int_fast32_t m_seed;
+	int m_d;
+	int_fast32_t m_iter_count;
 	Eigen::MatrixXd m_identity = Eigen::MatrixXd::Identity(m_d, m_d);
 	Eigen::MatrixXd m_scaling;
 	Rand m_rand;
+	Eigen::VectorXd m_para_no_update;
 	Eigen::VectorXd m_para_proposed;
+	Eigen::VectorXd m_para_current;
 	Eigen::VectorXd m_zero_vec;
-	void (AMHSampler::* update_scaling) ();
-	Eigen::VectorXd(AMHSampler::* gen_normal) ();
+	void (MCMCSampler::* update_scaling) ();
+	Eigen::VectorXd(MCMCSampler::* gen_normal) ();
 	bool m_adapt;
 	double m_scaling_para;
 	double m_R;
@@ -39,7 +41,9 @@ public:
 		m_iter_count = 0;
 		m_iter = iter;
 		m_bm = bm;
-		m_para_proposed = m_bm.get_para();
+		m_para_current = m_bm.get_para();
+		m_para_no_update = m_bm.get_para_no_update();
+		m_para_proposed = m_para_current;
 		m_d = bm.get_para_dim();
 		m_identity = Eigen::MatrixXd::Identity(m_d, m_d);
 		m_scaling_para = scaling_para;
@@ -58,17 +62,17 @@ public:
 		m_samples = Eigen::MatrixXd(m_iter, m_d);
 		m_adapt = false;
 		set_adapt_flag(m_adapt);
-		update_scaling = &AMHSampler::no_update;
+		update_scaling = &MCMCSampler::no_update;
 		m_R = -1000;
 		m_accept_vec = Eigen::VectorXd(m_iter);
 		m_zero_vec = Eigen::VectorXd::Zero(m_d);
 
 		if (m_d == 1)
 		{
-			gen_normal = &AMHSampler::gen_normal_univariate;
+			gen_normal = &MCMCSampler::gen_normal_univariate;
 		}
 		else {
-			gen_normal = &AMHSampler::gen_normal_multivariate;
+			gen_normal = &MCMCSampler::gen_normal_multivariate;
 		}
 	}
 
@@ -89,7 +93,7 @@ public:
 	void update_scaling_multivariate()
 	{
 		m_scaling_para = exp(log(m_scaling_para) + m_c_monroe * (m_R - m_p) / (std::max(200, (m_iter_count + 1) / m_d)));
-		m_moments.update(m_bm.get_para());
+		m_moments.update(m_para_current);
 		m_scaling = m_scaling_para * m_scaling_para * (m_moments.m_covmat +
 		m_scaling_para * m_scaling_para / double(m_iter_count + 1.0) * m_identity);
 	}
@@ -105,14 +109,14 @@ public:
 			m_moments = Moments(m_samples.block(0, 0, m_iter_count, m_d));
 			if (m_d == 1)
 			{
-				update_scaling = &AMHSampler::update_scaling_univariate;
+				update_scaling = &MCMCSampler::update_scaling_univariate;
 			}
 			else {
-				update_scaling = &AMHSampler::update_scaling_multivariate;
+				update_scaling = &MCMCSampler::update_scaling_multivariate;
 			}
 		}
 		else {
-			update_scaling = &AMHSampler::no_update;
+			update_scaling = &MCMCSampler::no_update;
 		}
 	}
 
@@ -128,13 +132,13 @@ public:
 
 	void update()
 	{
-		m_para_proposed = m_bm.get_para() + (this->*gen_normal)();
-		m_R = std::min(exp(m_bm.lp(m_para_proposed) - m_bm.lp()), 1.0);
+		m_para_proposed = m_para_current + (this->*gen_normal)();
+		m_R = std::min(exp(m_bm.lp(m_para_proposed) - m_bm.lp(m_para_current)), 1.0);
 		if (m_R > m_rand.unif())
 		{
-			m_bm.set_para(m_para_proposed);
+			m_para_current = m_para_proposed;
 		}
-		m_samples.row(m_iter_count) = m_bm.get_para();
+		m_samples.row(m_iter_count) = m_para_current;
 		(this->*update_scaling)();
 		m_accept_vec(m_iter_count) = m_R;
 		++m_iter_count;

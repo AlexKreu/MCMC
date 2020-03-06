@@ -12,26 +12,26 @@ static const Eigen::MatrixXd one_mat = Eigen::MatrixXd::Ones(1, 1);
 
 class Rand
 {
-	typedef boost::mt19937                     RENG;    // Mersenne Twister
-	typedef boost::normal_distribution<double> NDIST;   // Normal Distribution
-	typedef boost::variate_generator<RENG&, NDIST> NGEN;   // Normal Distribution Generator
-	typedef boost::uniform_real<double> UNIF;   // Uniform Distribution
-	typedef boost::variate_generator<RENG&, UNIF> UGEN; //Uniform Distribution Generator
+	typedef boost::mt19937                     RGEN;    // random number generator
+	typedef boost::normal_distribution<double> NDIST;   // Normal distribution
+	typedef boost::variate_generator<RGEN&, NDIST> NGEN;   // Normal distribution generator
+	typedef boost::uniform_real<double> UNIF;   // Uniform distribution
+	typedef boost::variate_generator<RGEN&, UNIF> UGEN; //Uniform distribution generator
 
 private:
-	RENG m_randgen;
+	RGEN m_randgen;
 	NDIST m_sndist;
 	NGEN m_sngen;
 	UNIF m_unif;
 	UGEN m_ugen;
 
 public:
-	Rand(int seed = 123) : m_randgen(RENG(seed)), m_sndist(NDIST(0, 1)), m_sngen(m_randgen, m_sndist), m_unif(UNIF(0, 1)), m_ugen(m_randgen, m_unif)
+	Rand(int seed = 123) : m_randgen(RGEN(seed)), m_sndist(NDIST(0, 1)), m_sngen(m_randgen, m_sndist), m_unif(UNIF(0, 1)), m_ugen(m_randgen, m_unif)
 	{};
 
 	void set_seed(int seed)
 	{
-		m_randgen = RENG(seed);
+		m_randgen = RGEN(seed);
 	}
 
 	double unif()
